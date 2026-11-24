@@ -4,10 +4,12 @@ class Validators {
     return regex.hasMatch(email);
   }
 
+  /// Memvalidasi bahwa [value] tidak kosong.
   static bool isNotEmpty(String? value) {
     return value != null && value.trim().isNotEmpty;
   }
 
+  /// Memvalidasi panjang [value] antara [min] dan [max].
   static bool hasValidLength(String value, {int min = 1, int max = 100}) {
     final length = value.trim().length;
     return length >= min && length <= max;
@@ -15,10 +17,10 @@ class Validators {
 
   static String sanitize(String input) {
     return input
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;')
+        .replaceAll('<', '<')
+        .replaceAll('>', '>')
+        .replaceAll('"', '"')
+        .replaceAll("'", "'")
         .trim();
   }
 
@@ -46,30 +48,52 @@ class Validators {
     }
     return null;
   }
-
-  // Latihan 3: Tambahan Validasi Lebih Ketat
   static String? validatePhone(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.trim().isEmpty) {
       return 'Nomor telepon tidak boleh kosong';
-    final regex = RegExp(r'^[0-9]{10,13}$');
-    if (!regex.hasMatch(value))
-      return 'Nomor telepon tidak valid (10-13 digit angka)';
+    }
+    
+    final phoneRegex = RegExp(r'^[0-9]{10,13}$');
+    
+    if (!phoneRegex.hasMatch(value.trim())) {
+      return 'Nomor telepon harus berupa angka (10-13 digit)';
+    }
     return null;
   }
 
   static String? validateUrl(String? value) {
-    if (value == null || value.isEmpty) return 'URL tidak boleh kosong';
-    final regex = RegExp(r'^(http|https)://');
-    if (!regex.hasMatch(value))
+    if (value == null || value.trim().isEmpty) {
+      return 'URL tidak boleh kosong';
+    }
+
+    final urlRegex = RegExp(r'^https?:\/\/.+');
+    
+    if (!urlRegex.hasMatch(value.trim())) {
       return 'URL harus dimulai dengan http:// atau https://';
+    }
     return null;
   }
-
   static String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Password tidak boleh kosong';
-    final regex = RegExp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
-    if (!regex.hasMatch(value))
-      return 'Password min 8 karakter, ada huruf kapital, angka, & simbol';
+    if (value == null || value.isEmpty) {
+      return 'Password tidak boleh kosong';
+    }
+    if (value.length < 8) {
+      return 'Password minimal 8 karakter';
+    }
+    final hasUppercase = RegExp(r'[A-Z]').hasMatch(value);
+    final hasDigits = RegExp(r'[0-9]').hasMatch(value);
+    final hasSpecialCharacters = RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value);
+
+    if (!hasUppercase) {
+      return 'Password harus mengandung minimal 1 huruf kapital (A-Z)';
+    }
+    if (!hasDigits) {
+      return 'Password harus mengandung minimal 1 angka (0-9)';
+    }
+    if (!hasSpecialCharacters) {
+      return r'Password harus mengandung minimal 1 simbol (!@#$%^&* dll)';
+    }
+
     return null;
   }
 }

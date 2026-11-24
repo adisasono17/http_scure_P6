@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../utils/app_logger.dart';
 
 class SecureStorageService {
   static const _storage = FlutterSecureStorage(
@@ -11,22 +12,22 @@ class SecureStorageService {
   // Menyimpan token
   Future<void> saveToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
-    // ✅ Logging aman: tidak mencetak token
-    print('Token berhasil disimpan');
+    AppLogger.info('Token berhasil disimpan secara terenkripsi.', tag: 'SecureStorage');
   }
 
-  // Membaca token
   Future<String?> getToken() async {
     final token = await _storage.read(key: _tokenKey);
-    // ✅ Logging aman: hanya menyebutkan status
-    print(token != null ? 'Token ditemukan' : 'Token tidak ditemukan');
+    AppLogger.debug(
+      token != null ? 'Token ditemukan' : 'Token tidak ditemukan',
+      tag: 'SecureStorage',
+    );
     return token;
   }
 
   // Menghapus token
   Future<void> deleteToken() async {
     await _storage.delete(key: _tokenKey);
-    print('Token berhasil dihapus');
+    AppLogger.info('Token berhasil dihapus dari penyimpanan.', tag: 'SecureStorage');
   }
 
   // Menyimpan PIN

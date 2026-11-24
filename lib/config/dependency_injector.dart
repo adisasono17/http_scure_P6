@@ -1,21 +1,36 @@
-import '../services/api_service.dart';
-import '../repositories/user_repository.dart';
-import '../repositories/user_repository_impl.dart';
+import 'package:flutter/material.dart';
 import '../repositories/post_repository.dart';
 import '../repositories/post_repository_impl.dart';
+import '../repositories/user_repository.dart';
+import '../repositories/user_repository_impl.dart';
+import '../services/api_service.dart';
 
-class DependencyInjector {
-  static final DependencyInjector _instance = DependencyInjector._internal();
-  factory DependencyInjector() => _instance;
-  DependencyInjector._internal();
+class DependencyInjector extends InheritedWidget {
+  static final ApiService _apiServiceInstance = ApiService();
 
-  late final ApiService apiService;
-  late final UserRepository userRepository;
-  late final PostRepository postRepository;
+  final ApiService apiService;
+  final UserRepository userRepository;
+  final PostRepository postRepository;
 
-  void setup() {
-    apiService = ApiService();
-    userRepository = UserRepositoryImpl(apiService: apiService);
-    postRepository = PostRepositoryImpl(apiService: apiService);
+  DependencyInjector({
+    super.key,
+    required super.child,
+    ApiService? apiService,
+    UserRepository? userRepository,
+    PostRepository? postRepository,
+  })  : apiService = apiService ?? _apiServiceInstance,
+        userRepository = userRepository ??
+            UserRepositoryImpl(apiService: apiService ?? _apiServiceInstance),
+        postRepository = postRepository ??
+            PostRepositoryImpl(apiService: apiService ?? _apiServiceInstance);
+
+  static DependencyInjector of(BuildContext context) {
+    final DependencyInjector? result =
+        context.dependOnInheritedWidgetOfExactType<DependencyInjector>();
+    assert(result != null, 'No DependencyInjector found in context');
+    return result!;
   }
+
+  @override
+  bool updateShouldNotify(DependencyInjector oldWidget) => false;
 }
